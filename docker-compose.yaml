@@ -1,0 +1,41 @@
+# docker-compose up -d
+# docker-compose logs -f [app_name]
+version: "3.7"
+
+services:
+  app:
+    image: node:12-alpine
+    command: sh -c "yarn install && yarn run dev"
+    ports:
+      - 3000:3000
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: todos
+  
+  #automatically gets the network alias from the app name "mysql"
+  mysql:
+    image: mysql:5.7
+    volumes:
+      # the named volume "todo-mysql-data" would be created automatically when with docker run command,
+      # but not true with docker-compose. to dealt with it, 
+      # first define the volume in the top-level volumes, then specify the mountpoint in the service config
+      - todo-mysql-data:/var/lib/mysql
+    environment: 
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: todos
+
+volumes:
+  #use default volume options 
+  todo-mysql-data:
+
+# Well, what happens if the containers die?
+# How do you scale across several machines?
+#next
+#Container Orchestration
+
+
